@@ -301,6 +301,23 @@ def dark_theme(choice):
     return True
 
 
+def text_scale(tkfont, root, family, scale):
+    """The scale for the window's layout on a Linux desktop, given the scale the display reports.
+
+    Desktops there enlarge text through their own font setting, which the display's figure for dots per
+    inch does not show. So measure it: text one inch high (72 points) against text 96 pixels high. Where
+    the text is clearly larger or smaller than the display's figure says, the layout follows the text.
+    """
+    try:
+        sample = "The quick brown fox jumps over the lazy dog 0123456789"
+        inch = tkfont.Font(root=root, family=family, size=72).measure(sample)
+        base = tkfont.Font(root=root, family=family, size=-96).measure(sample)
+        drawn = inch / base
+        return drawn if 0.5 <= drawn <= 8 and abs(drawn - scale) > 0.05 * scale else scale
+    except Exception:
+        return scale
+
+
 # ----------------------------------------------------------------------------- the window
 
 def run_window(a):
@@ -329,6 +346,8 @@ def run_window(a):
     pt = lambda n: int(round(n * 1.3)) if MAC else n            # macOS draws a point smaller
     C = DARK if dark_theme(a.theme) else LIGHT
     F = "Segoe UI" if WINDOWS else tkfont.nametofont("TkDefaultFont").actual("family")
+    if not (WINDOWS or MAC):                          # Linux: go by the size text is really drawn at
+        scale = text_scale(tkfont, root, F, scale)
     W = px(330)
     root.title("ClaudePROG")
     root.configure(bg=C["bg"])
@@ -384,13 +403,18 @@ def run_window(a):
 
     tk.Frame(body, bg=C["track"], height=max(1, px(1))).pack(fill="x", pady=(px(12), px(8)))
     on_top = [True]
-    top_box = label(body, "☑  Keep on top of other windows", 10, "muted", cursor="hand2")
+    boxes = ("☑", "☐")
+    if not (WINDOWS or MAC):                          # Linux: where Tk has no font that can draw these two,
+        probe = tkfont.Font(root=root, family=F, size=pt(10))           # it shows nothing or their code numbers
+        if not all(0 < probe.measure(box) < probe.measure("\\u2611") for box in boxes):
+            boxes = ("[x]", "[  ]")
+    top_box = label(body, boxes[0] + "  Keep on top of other windows", 10, "muted", cursor="hand2")
     top_box.pack(fill="x")
 
     def toggle_on_top(_event=None):
         on_top[0] = not on_top[0]
         root.attributes("-topmost", on_top[0])
-        top_box.config(text=("☑" if on_top[0] else "☐") + "  Keep on top of other windows")
+        top_box.config(text=(boxes[0] if on_top[0] else boxes[1]) + "  Keep on top of other windows")
     top_box.bind("<Button-1>", toggle_on_top)
     note = label(body, "Closing this window does not stop the job.", 9, "muted")
     note.pack(fill="x", pady=(px(2), 0))
@@ -516,6 +540,26 @@ def open_window(a, pid, started, show_at):
     return detached(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def hand_over(pid, code, window):
+    """Leave the job's exit code where the window looks for it (only needed away from Windows).
+
+    The window removes the note once it has read it. A note that no window is left to read (the job was
+    over before the window was due, or the window was closed or could not open) is taken away again.
+    """
+    note = exit_note(pid)
+    try:
+        if window.poll() is None:
+            with open(note, "w") as f:
+                f.write(str(code))
+            patience = time.monotonic() + 5
+            while window.poll() is None and os.path.exists(note) and time.monotonic() < patience:
+                time.sleep(0.05)
+        if window.poll() is not None:
+            os.remove(note)
+    except OSError:
+        pass
+
+
 # ----------------------------------------------------------------------------- the command
 
 def main():
@@ -584,6 +628,11 @@ def main():
             return 1
         pid, started = a.pid, a.started or time.time()
         running, exit_code = job.running, job.exit_code
+        if not WINDOWS:
+            try:
+                os.remove(exit_note(pid))             # left by an earlier job that had the same number
+            except OSError:
+                pass
     else:
         ap.error("give a command after --, or --pid of a running job, or --demo")
 
@@ -604,11 +653,7 @@ def main():
 
     code = exit_code()
     if command and code is not None and not WINDOWS:  # Windows lets the window read the exit code itself
-        try:
-            with open(exit_note(pid), "w") as f:
-                f.write(str(code))
-        except OSError:
-            pass
+        hand_over(pid, code, window)
     print(f"job ended {clock(time.time())} after {fmt_dur(time.time() - started)}, exit code {code}")
     for line in tail_lines(a.log) if a.log else []:
         print("  " + line[:200])
