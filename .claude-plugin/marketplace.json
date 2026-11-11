@@ -1,0 +1,14 @@
+{
+  "name": "job-monitor",
+  "owner": { "name": "Hverdu86" },
+  "metadata": {
+    "description": "Job monitor: a desktop window with a countdown and live hardware load for long background jobs."
+  },
+  "plugins": [
+    {
+      "name": "job-monitor",
+      "source": "./",
+      "description": "A pop-out desktop window with a countdown, progress and live hardware load for long background jobs."
+    }
+  ]
+}

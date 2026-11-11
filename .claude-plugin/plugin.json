@@ -1,0 +1,10 @@
+{
+  "name": "job-monitor",
+  "version": "0.1.0",
+  "description": "A pop-out desktop window with a countdown, progress and live hardware load for long background jobs, and a clear message when they finish.",
+  "author": { "name": "Hverdu86", "url": "https://github.com/Hverdu86" },
+  "homepage": "https://github.com/Hverdu86/job-monitor",
+  "repository": "https://github.com/Hverdu86/job-monitor",
+  "license": "MIT",
+  "keywords": ["progress", "countdown", "monitor", "gpu", "background-jobs"]
+}
