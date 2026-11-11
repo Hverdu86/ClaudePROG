@@ -1,12 +1,12 @@
 ---
-name: job-monitor
+name: claudeprog
 description: Opens a pop-out desktop window with a countdown, progress bar and live hardware load (GPU, GPU memory, processor, memory) while a long command runs, and shows "Project complete" with a close button when it ends. Use it whenever you are about to run a command in the background that could take more than 10 minutes, such as model training, data or document conversion, large builds, long test suites, renders, downloads or batch jobs. Also use it when the user asks for a timer, a countdown, a progress window, or a way to see that a job is still running and how hard their GPU or computer is working.
 ---
 
-# Job monitor
+# ClaudePROG
 
 A long job running in the background is invisible to the person waiting for it. This skill
-runs the job through `scripts/job_monitor.py` (in this skill's folder), which starts the job,
+runs the job through `scripts/claudeprog.py` (in this skill's folder), which starts the job,
 opens a small window on the person's desktop, and reports back when the job ends.
 
 The window shows a countdown to the estimated finish, a progress bar, and live load for the
@@ -28,7 +28,7 @@ quick costs nothing.
 Run this as a background command, so that you are told when the job ends:
 
 ```
-python "<this skill's folder>/scripts/job_monitor.py" --title "Model training" --minutes 90 --log train.log -- python train.py --epochs 30
+python "<this skill's folder>/scripts/claudeprog.py" --title "Model training" --minutes 90 --log train.log -- python train.py --epochs 30
 ```
 
 - Everything after `--` is the command, exactly as you would have run it.
@@ -50,7 +50,7 @@ two groups, done and total, for example `--pattern "step (\d+) of (\d+)"`.
 ## Watching a job that is already running
 
 ```
-python "<this skill's folder>/scripts/job_monitor.py" --title "Video export" --minutes 45 --pid 12345 --log export.log
+python "<this skill's folder>/scripts/claudeprog.py" --title "Video export" --minutes 45 --pid 12345 --log export.log
 ```
 
 `--minutes` then means the time left from now, unless you also pass `--started` with the

@@ -1,4 +1,4 @@
-# Job monitor
+# ClaudePROG
 
 A small desktop window that shows you a long job is still alive: a countdown to the
 estimated finish, a progress bar, and how hard your GPU, processor and memory are working.
@@ -32,17 +32,17 @@ Everything runs on your own computer. Nothing is sent anywhere.
 At the prompt of a terminal session:
 
 ```
-/plugin install job-monitor --marketplace Hverdu86/job-monitor
+/plugin install claudeprog --marketplace Hverdu86/ClaudePROG
 ```
 
 From a shell:
 
 ```
-claude plugin install job-monitor --marketplace Hverdu86/job-monitor
+claude plugin install claudeprog --marketplace Hverdu86/ClaudePROG
 ```
 
 In the desktop app, where `/plugin` does not run: click + next to the prompt box, then
-Plugins, Add marketplace with `Hverdu86/job-monitor`, then Add plugin.
+Plugins, Add marketplace with `Hverdu86/ClaudePROG`, then Add plugin.
 
 Answer `y` to add the marketplace, then pick a scope (the user scope makes it available in
 every project).
@@ -52,24 +52,24 @@ After that there is nothing to remember. Ask Claude to run something long, or sa
 
 ## Use it without Claude
 
-You only need the one file, `skills/job-monitor/scripts/job_monitor.py`.
+You only need the one file, `skills/claudeprog/scripts/claudeprog.py`.
 
 See what it looks like, with a one-minute pretend job:
 
 ```
-python job_monitor.py --demo
+python claudeprog.py --demo
 ```
 
 Start a job and watch it. Everything after `--` is your command:
 
 ```
-python job_monitor.py --title "Model training" --minutes 90 --log train.log -- python train.py
+python claudeprog.py --title "Model training" --minutes 90 --log train.log -- python train.py
 ```
 
 Watch a job that is already running, by its process id:
 
 ```
-python job_monitor.py --title "Video export" --minutes 45 --pid 12345
+python claudeprog.py --title "Video export" --minutes 45 --pid 12345
 ```
 
 | Option | What it does |

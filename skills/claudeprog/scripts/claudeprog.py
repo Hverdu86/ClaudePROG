@@ -1,5 +1,5 @@
 r"""
-job_monitor.py - a small desktop window for long-running jobs.
+ClaudePROG (claudeprog.py) - a small desktop window for long-running jobs.
 
 The window can be dragged anywhere on the desktop and shows:
   - a countdown to the estimated finish time, and how far along the job is
@@ -10,11 +10,11 @@ It opens straight away for a job expected to take more than 10 minutes, and othe
 only once a job has been running for 10 minutes. Closing the window never stops the job.
 
 Start a job and watch it (everything after -- is the command to run):
-    python job_monitor.py --title "Model training" --minutes 90 --log train.log -- python train.py
+    python claudeprog.py --title "Model training" --minutes 90 --log train.log -- python train.py
 Watch a job that is already running:
-    python job_monitor.py --title "Video export" --minutes 45 --pid 12345 --log export.log
+    python claudeprog.py --title "Video export" --minutes 45 --pid 12345 --log export.log
 See what the window looks like (a one-minute pretend job):
-    python job_monitor.py --demo
+    python claudeprog.py --demo
 
     --minutes     your estimate for the whole job; leave it out if you have none
     --log         the file the job's output goes to. Lines containing "[25/300]" are used
@@ -84,7 +84,7 @@ else:
 
 def exit_note(pid):
     """Where the command that started a job leaves its exit code for the window to read."""
-    return os.path.join(tempfile.gettempdir(), f"job_monitor_{pid}.exit")
+    return os.path.join(tempfile.gettempdir(), f"claudeprog_{pid}.exit")
 
 
 class Job:
@@ -330,7 +330,7 @@ def run_window(a):
     C = DARK if dark_theme(a.theme) else LIGHT
     F = "Segoe UI" if WINDOWS else tkfont.nametofont("TkDefaultFont").actual("family")
     W = px(330)
-    root.title("Job monitor")
+    root.title("ClaudePROG")
     root.configure(bg=C["bg"])
     root.resizable(False, False)
 
@@ -489,7 +489,7 @@ def run_window(a):
 
 
 def error_log():
-    return os.path.join(tempfile.gettempdir(), "job_monitor_error.log")
+    return os.path.join(tempfile.gettempdir(), "claudeprog_error.log")
 
 
 def report_error():
@@ -535,7 +535,7 @@ def main():
     ap.add_argument("--theme", default="auto", choices=["auto", "dark", "light"])
     ap.add_argument("--cwd", default=None, help="folder to run the command in")
     ap.add_argument("--demo", action="store_true", help="show the window with a one-minute pretend job")
-    ap.add_argument("--version", action="version", version=f"job_monitor {__version__}")
+    ap.add_argument("--version", action="version", version=f"ClaudePROG {__version__}")
     ap.add_argument("--window", action="store_true", help=argparse.SUPPRESS)
     ap.add_argument("--show-at", type=float, default=0, help=argparse.SUPPRESS)
     ap.add_argument("--snapshot", default="", help=argparse.SUPPRESS)
@@ -557,7 +557,7 @@ def main():
         command = [sys.executable, "-u", "-c", DEMO]
         a.title = "Demo job (takes one minute)" if a.title == "Background job" else a.title
         a.minutes, a.show_now = a.minutes or 1, True
-        a.log = a.log or os.path.join(tempfile.gettempdir(), "job_monitor_demo.log")
+        a.log = a.log or os.path.join(tempfile.gettempdir(), "claudeprog_demo.log")
         open(a.log, "w").close()
 
     if command:
